@@ -90,6 +90,7 @@ public class GameController {
 				game.nextAction(); // This will deal community cards and identify hands
 			}
 
+			// Now use getWinningHand() to get the winning hand and player
 			String winnerName = game.getWinningHand()
 					.map(hand -> hand.getPlayer() != null ? hand.getPlayer().getName() : "Unknown Player")
 					.orElse("No winner determined");
@@ -98,6 +99,9 @@ public class GameController {
 				Map<String, String> playerMap = new HashMap<>();
 				playerMap.put("name", player.getName());
 				playerMap.put("hand", player.getHand() != null ? player.getHand().toString() : "No hand");
+				// Mark the winner and loser
+				playerMap.put("isWinner", player.getName().equals(winnerName) ? "true" : "false");
+				playerMap.put("isLoser", !player.getName().equals(winnerName) ? "true" : "false");
 				return playerMap;
 			}).collect(Collectors.toList());
 

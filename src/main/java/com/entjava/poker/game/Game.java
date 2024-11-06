@@ -69,10 +69,6 @@ public class Game {
         }
     }
 
-    public Optional<Hand> getWinningHand() {
-        return Optional.ofNullable(winningHand);
-    }
-
     public void identifyWinningHand() {
         List<Hand> playerHands = players.stream()
                 .map(this::identifyPlayerHand)
@@ -88,13 +84,19 @@ public class Game {
             return 0;
         });
 
-        Hand winningHand = playerHands.get(0);
-        Player winningPlayer = players.get(playerHands.indexOf(winningHand));
+        Hand winningHand = playerHands.get(0); // Get the winning hand
+        Player winningPlayer = players.get(playerHands.indexOf(winningHand)); // Get the player with the winning hand
 
-        winningHand.setPlayer(winningPlayer);
-        this.winningHand = winningHand;
+        winningHand.setPlayer(winningPlayer); // Set the player to the winning hand
+        this.winningHand = winningHand; // Save the winning hand in the game
         System.out.println("Winner: " + winningPlayer.getName() + " with hand: " + winningHand);
     }
+
+    public Optional<Hand> getWinningHand() {
+        return Optional.ofNullable(winningHand);
+    }
+
+
 
     public boolean checkIfPlayerWon(Player player) {
         Hand playerHand = identifyPlayerHand(player);

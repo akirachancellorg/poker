@@ -15,6 +15,23 @@
       <ProjectState />
     </projectState>
   </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="poker" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -31,12 +48,12 @@
     &quot;assignee&quot;: &quot;dadan041100&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/webyn/queencard-poker.git&quot;,
-    &quot;accountId&quot;: &quot;5fd215d1-7af2-4815-8b62-1330390134a0&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/dadan041100/queencard-poker.git",
+    "accountId": "5fd215d1-7af2-4815-8b62-1330390134a0"
   }
-}</component>
+}]]></component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
@@ -192,6 +209,7 @@
       <updated>1729311028425</updated>
       <workItem from="1729311030436" duration="572000" />
       <workItem from="1730908288758" duration="2656000" />
+      <workItem from="1730920122861" duration="647000" />
     </task>
     <servers />
   </component>
