@@ -1,87 +1,55 @@
 package com.entjava.poker.game;
 
-import com.entjava.poker.hand.Hand;
-import com.entjava.poker.hand.WinningHandCalculator;
 import com.entjava.poker.card.Card;
 import com.entjava.poker.deck.Deck;
 import com.entjava.poker.deck.DeckBuilder;
+import com.entjava.poker.hand.Hand;
 import com.entjava.poker.hand.HandIdentifier;
+import com.entjava.poker.hand.WinningHandCalculator;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * The game engine.
- */
 @Component
 public class Game {
 
     private List<Player> players = new ArrayList<>();
-
     private List<Card> communityCards = new ArrayList<>();
-
     private DeckBuilder deckBuilder;
     private HandIdentifier handIdentifier;
     private WinningHandCalculator winningHandCalculator;
-
     private Deck deck;
-
     private Hand winningHand = null;
-
     private static final int MAX_PLAYER_CARDS = 2;
     private static final int MAX_COMMUNITY_CARDS = 5;
 
-    public Game(DeckBuilder deckBuilder,
-                HandIdentifier handIdentifier,
-                WinningHandCalculator winningHandCalculator) {
-        players.add(new Player("Alex"));
-        players.add(new Player("Bob"));
-        players.add(new Player("Jane"));
-
+    public Game(DeckBuilder deckBuilder, HandIdentifier handIdentifier, WinningHandCalculator winningHandCalculator) {
         this.deckBuilder = deckBuilder;
         this.handIdentifier = handIdentifier;
         this.winningHandCalculator = winningHandCalculator;
-
+        addPlayers(); // Directly adding players
         startNewGame();
     }
 
-    /**
-     * Starts a new game.
-     *
-     * <h3>The following describes a new game.</h3>
-     * <ul>
-     * <li>Players' previous hands are cleared</li>
-     * <li>Community cards are cleared</li>
-     * <li>A new deck is used</li>
-     * <li>The deck is shuffled</li>
-     * <li>Players' are dealt with new cards.</li>
-     * </ul>
-     */
+    private void addPlayers() {
+        List<String> playerNames = Arrays.asList("Dadan", "Haze", "Joanny", "Migs", "Jude", "Robyn", "Jesse");
+        Collections.shuffle(playerNames); // Shuffle the list to randomize the selection
+
+        // Select the first 4 players from the shuffled list
+        for (int i = 0; i < 4; i++) {
+            players.add(new Player(playerNames.get(i)));
+        }
+    }
+
     public void startNewGame() {
         players.forEach(Player::clearHand);
         communityCards.clear();
-
         deck = deckBuilder.buildDeck();
         deck.shuffle();
-
         dealHands();
     }
 
-    /**
-     * The action to take after a new game has been started.
-     *
-     * <ol>
-     * <li>Deal three community cards</li>
-     * <li>Deal one community card</li>
-     * <li>Deal another community card</li>
-     * <li>Determine the winner/s</li>
-     * </ol>
-     * <p>
-     * Dealt community are of course removed from the deck at the time their placed on the table.
-     */
     public void nextAction() {
         if (communityCards.isEmpty()) {
             burnCard();
@@ -91,46 +59,48 @@ public class Game {
             dealOneCommunityCard();
         }
 
+        players.forEach(player -> {
+            Hand playerHand = handIdentifier.identifyHand(player.getHand(), communityCards);
+            player.setPlayableHand(playerHand);
+        });
+
         if (hasEnded()) {
             identifyWinningHand();
-            System.out.println(winningHand.getCurrentHand());
         }
     }
 
-    /**
-     * Checks the combination of the players and community cards to identify the winning hand.
-     *
-     * @see <a href="https://www.youtube.com/watch?v=GAoR9ji8D6A">Poker rules</a>
-     */
+    public Optional<Hand> getWinningHand() {
+        return Optional.ofNullable(winningHand);
+    }
+
     public void identifyWinningHand() {
         List<Hand> playerHands = players.stream()
                 .map(this::identifyPlayerHand)
                 .collect(Collectors.toList());
-        Optional<Hand> optionalHand = winningHandCalculator.calculateWinningHand(playerHands);
 
-        winningHand = optionalHand.get();
-        System.out.println(winningHand);
+        playerHands.sort((h1, h2) -> {
+            int rankComparison = Integer.compare(h2.getRank(), h1.getRank());
+            if (rankComparison != 0) return rankComparison;
+            for (int i = 0; i < h1.getCurrentHand().size(); i++) {
+                int cardComparison = h2.getCurrentHand().get(i).compareTo(h1.getCurrentHand().get(i));
+                if (cardComparison != 0) return cardComparison;
+            }
+            return 0;
+        });
+
+        Hand winningHand = playerHands.get(0);
+        Player winningPlayer = players.get(playerHands.indexOf(winningHand));
+
+        winningHand.setPlayer(winningPlayer);
+        this.winningHand = winningHand;
+        System.out.println("Winner: " + winningPlayer.getName() + " with hand: " + winningHand);
     }
 
-    /**
-     * Checks if the player won
-     *
-     * @param player
-     * @return true if the player's hand is equal to the winning hand.
-     */
     public boolean checkIfPlayerWon(Player player) {
         Hand playerHand = identifyPlayerHand(player);
         return winningHand != null && (winningHand.getCurrentHand()).equals(player.getPlayableHand().getCurrentHand());
     }
 
-    /**
-     * Identifies the player's hand. A hand is combination of the two cards in the player's
-     * possession and the community cards on the table.
-     *
-     * @param player
-     * @return The {@link} of a player, e.g. High Card, One Pair, Straight, etc.
-     * @see <a href="https://www.youtube.com/watch?v=GAoR9ji8D6A">Poker rules</a>
-     */
     public Hand identifyPlayerHand(Player player) {
         List<Card> playerCards = player.getHand();
         Hand playableHand = handIdentifier.identifyHand(playerCards, communityCards);
@@ -138,23 +108,14 @@ public class Game {
         return playableHand;
     }
 
-    /**
-     * @return The list of {@link Player}s
-     */
     public List<Player> getPlayers() {
         return players;
     }
 
-    /**
-     * @return The list of community cards {@link Card}
-     */
     public List<Card> getCommunityCards() {
         return communityCards;
     }
 
-    /**
-     * @return true if the number of community cards is equal to the maximum community cards allowed.
-     */
     public boolean hasEnded() {
         return communityCards.size() >= MAX_COMMUNITY_CARDS;
     }
@@ -186,5 +147,4 @@ public class Game {
     public String displayCurrentHand(Player player) {
         return player.getHand().get(0).getRank().toString();
     }
-
 }
