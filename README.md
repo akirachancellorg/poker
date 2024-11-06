@@ -37,9 +37,14 @@ Before you start applying changes to the code, it is recommended that you run th
 - Need at least Java 8 or higher installed
 - IntelliJ IDEA is recommended. The Community Edition will do just fine.
   Otherwise, you can open the project in your editor of choice.
+- Set up a connection to your db (you may have to edit build.gradle for this, the project is set up only for postgres)
+- Run migrations and player seeder (`resources/migration.sql`) 
 - To run the application, go to the project directory and `./gradlew bootRun`. 
 - Check `http://localhost:8080` to see if it's working.
 - To run the tests, run `./gradlew test` in the root directory of the project.
+- Enter number of players, and enter the names of players
+  (the registered players are only `ed`, `dan`, `mon`, `jm`, `kai`, `kent`, `vin`, & `liam`)
+- click start game and run the poker simulation
 
 **Note on Spring and Dependency Injection:** Spring allows us to use Dependency Injection to inject the Game instance 
 into our Web Controller. While knowledge of Dependency Injection and Spring is not required to answer the exam, 
@@ -87,3 +92,32 @@ new classes you might create.
   - In the event of a [tie](https://en.wikipedia.org/wiki/Texas_hold_%27em#Kickers_and_ties), declare tied players as 
   the winners.
 - (Optional essay) What is the major flaw in this web application if we were to host it on a server for other people to use? (Please consider the technical aspect rather than the game rules when answering this question.)
+
+## Changes Made:
+
+- Added Models, as well as DTOs, for `Event`, `Player`, and `EventPlayer` models.
+- Added services and repository.
+- (Requirement 1) Implemented endpoints to start a new game with specified player names.
+- Implemented functionality to save the winner in the `EventPlayer` table.
+- Updated the front page to display user standings and total wins.
+- (Requirement 2) Added an endpoint to fetch event details by ID and return a custom formatted JSON response.
+- Added a document essay
+
+### New Features:
+
+- **Start Game with Player Names**: You can now start a new game by specifying player names. The game will only start with registered players.
+- **Save Game Results**: The winner of each game is saved in the `EventPlayer` table along with their hand.
+- **User Standings**: The front page now displays the total wins of each player.
+- **Event Details Endpoint**: A new endpoint `/api/event/{eventId}` returns the details of an event, including the players and the winner.
+
+### Available Endpoints:
+- **GET /api/events**  
+  Retrieves a list of all available game IDs with their respective session information.
+- **GET /api/players**  
+  Returns a list of all players, including their IDs, names, and the total number of players.
+- **GET /api/players/{id}**  
+  Retrieves detailed information for a specific player, including the player's ID and name.
+- **GET /api/event/{id}**  
+  Returns the results of a specific event by ID, displaying the winning players in the session along with their cards.
+- **POST /game_start/{id}**  
+  Starts a new game session for a specified game ID with a given number of players.

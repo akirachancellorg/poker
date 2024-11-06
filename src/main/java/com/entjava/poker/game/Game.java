@@ -2,10 +2,17 @@ package com.entjava.poker.game;
 
 import com.entjava.poker.hand.Hand;
 import com.entjava.poker.hand.WinningHandCalculator;
+import com.entjava.poker.model.Event;
+import com.entjava.poker.model.EventPlayer;
 import com.entjava.poker.card.Card;
 import com.entjava.poker.deck.Deck;
 import com.entjava.poker.deck.DeckBuilder;
 import com.entjava.poker.hand.HandIdentifier;
+import com.entjava.poker.model.PlayerEntity;
+import com.entjava.poker.repository.EventPlayerRepository;
+import com.entjava.poker.repository.EventRepository;
+import com.entjava.poker.repository.PlayerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -33,6 +40,15 @@ public class Game {
 
     private static final int MAX_PLAYER_CARDS = 2;
     private static final int MAX_COMMUNITY_CARDS = 5;
+
+    @Autowired
+    private PlayerRepository playerRepository;
+
+    @Autowired
+    private EventPlayerRepository eventPlayerRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
 
     public Game(DeckBuilder deckBuilder,
                 HandIdentifier handIdentifier,
@@ -70,6 +86,13 @@ public class Game {
         dealHands();
     }
 
+    public void startNewGameWithPlayers(List<String> playerNames) {
+        this.players = playerNames.stream()
+            .map(Player::new)
+            .collect(Collectors.toList());
+        
+        startNewGame();
+    }
     /**
      * The action to take after a new game has been started.
      *
@@ -93,10 +116,39 @@ public class Game {
 
         if (hasEnded()) {
             identifyWinningHand();
+            saveGameResult();
             System.out.println(winningHand.getCurrentHand());
         }
     }
 
+    public void saveGameResult() {
+
+        Event currentEvent = new Event();
+        eventRepository.save(currentEvent);
+
+        List<Player> players = getPlayers();
+
+        for (Player player : players) {
+            Optional<PlayerEntity> playerEntityOptional = playerRepository.findByName(player.getName());
+
+            if (playerEntityOptional.isPresent()) {
+                PlayerEntity playerEntity = playerEntityOptional.get();
+
+                EventPlayer eventPlayer = new EventPlayer();
+                eventPlayer.setPlayer(playerEntity);
+                eventPlayer.setEvent(currentEvent);
+                eventPlayer.setWinner(checkIfPlayerWon(player));
+                eventPlayer.setHand(player.getPlayableHand().getCurrentHand().toString());
+
+                eventPlayerRepository.save(eventPlayer);
+            }
+
+        }
+        // for each player
+        //   get their player ids in database using their string names
+        //   check if they are winner
+        //   save them in eventplayer table
+    }
     /**
      * Checks the combination of the players and community cards to identify the winning hand.
      *
