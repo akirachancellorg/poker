@@ -3,15 +3,23 @@ package com.entjava.poker.game;
 import com.entjava.poker.hand.Hand;
 import com.entjava.poker.card.Card;
 
+import javax.persistence.*;
+import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A player in the game.
  */
+@Entity
+@Table(name = "players")
 public class Player {
-
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
 	private String name;
+
+	@Transient
 	private List<Card> hand = new ArrayList<>();
 
 	public Player() {};
@@ -23,6 +31,7 @@ public class Player {
 		return name;
 	}
 
+	@Transient
 	public List<Card> getHand() {
 		return hand;
 	}
@@ -39,6 +48,7 @@ public class Player {
 		return name;
 	}
 
+	@Transient
 	public Hand getPlayableHand() {
 		return playableHand;
 	}
@@ -47,6 +57,7 @@ public class Player {
 		this.playableHand = playableHand;
 	}
 
+	@Transient
 	private Hand playableHand;
 
 }

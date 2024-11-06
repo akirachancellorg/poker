@@ -29,6 +29,7 @@ dependencies {
 	compile('org.webjars:bootstrap:4.1.2')
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-web')
+	compileOnly 'org.projectlombok:lombok:1.18.30' // Use the latest version available
 
 	runtimeOnly('mysql:mysql-connector-java:8.0.33')
 

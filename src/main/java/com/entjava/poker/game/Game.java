@@ -6,11 +6,13 @@ import com.entjava.poker.card.Card;
 import com.entjava.poker.deck.Deck;
 import com.entjava.poker.deck.DeckBuilder;
 import com.entjava.poker.hand.HandIdentifier;
+import com.entjava.poker.model.GameEntity;
+import com.entjava.poker.repository.GameRepository;
+import com.entjava.poker.repository.PlayerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -18,10 +20,18 @@ import java.util.stream.Collectors;
  */
 @Component
 public class Game {
+    @Autowired
+    private GameRepository gameRepository;
+
+    @Autowired
+    private PlayerRepository playerRepository;
 
     private List<Player> players = new ArrayList<>();
 
     private List<Card> communityCards = new ArrayList<>();
+
+    private List<Player> winners = new ArrayList<>();
+    private List<Player> losers = new ArrayList<>();
 
     private DeckBuilder deckBuilder;
     private HandIdentifier handIdentifier;
@@ -39,7 +49,8 @@ public class Game {
                 WinningHandCalculator winningHandCalculator) {
         players.add(new Player("Alex"));
         players.add(new Player("Bob"));
-        players.add(new Player("Jane"));
+        players.add(new Player("Jane"));;
+        players.add(new Player("Fae"));
 
         this.deckBuilder = deckBuilder;
         this.handIdentifier = handIdentifier;
@@ -108,8 +119,31 @@ public class Game {
                 .collect(Collectors.toList());
         Optional<Hand> optionalHand = winningHandCalculator.calculateWinningHand(playerHands);
 
-        winningHand = optionalHand.get();
-        System.out.println(winningHand);
+        if (optionalHand.isPresent()) {
+            winningHand = optionalHand.get();
+            determineWinnersAndLosers();
+        }
+    }
+
+    private void determineWinnersAndLosers() {
+        winners.clear();
+        losers.clear();
+
+        for (Player player : players) {
+            if (checkIfPlayerWon(player)) {
+                winners.add(player);
+            } else {
+                losers.add(player);
+            }
+        }
+    }
+
+    public List<Player> getWinners() {
+        return winners;
+    }
+
+    public List<Player> getLosers() {
+        return losers;
     }
 
     /**
