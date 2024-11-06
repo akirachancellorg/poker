@@ -13,11 +13,15 @@ public class Player {
 
 	private String name;
 	private List<Card> hand = new ArrayList<>();
+	private boolean isWinner = false;
+	private boolean isLoser = false;
 
+	// Constructor
 	public Player(String name) {
 		this.name = name;
 	}
 
+	// Getters and setters
 	public String getName() {
 		return name;
 	}
@@ -38,6 +42,22 @@ public class Player {
 		return name;
 	}
 
+	public boolean isWinner() {
+		return isWinner;
+	}
+
+	public void setWinner(boolean winner) {
+		isWinner = winner;
+	}
+
+	public boolean isLoser() {
+		return isLoser;
+	}
+
+	public void setLoser(boolean loser) {
+		isLoser = loser;
+	}
+
 	public Hand getPlayableHand() {
 		return playableHand;
 	}
@@ -47,5 +67,5 @@ public class Player {
 	}
 
 	private Hand playableHand;
-
 }
+
