@@ -49,9 +49,6 @@ event   -> id
             }
         },
     "winner" : "AliceGuo"
-
-
-
 }
 
 
