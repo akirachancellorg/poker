@@ -29,6 +29,9 @@ public class Game {
 
     private Deck deck;
 
+    private List<Player> winners = new ArrayList<>();
+    private List<Player> losers = new ArrayList<>();
+
     private Hand winningHand = null;
 
     private static final int MAX_PLAYER_CARDS = 2;
@@ -37,9 +40,10 @@ public class Game {
     public Game(DeckBuilder deckBuilder,
                 HandIdentifier handIdentifier,
                 WinningHandCalculator winningHandCalculator) {
-        players.add(new Player("Alex"));
-        players.add(new Player("Bob"));
-        players.add(new Player("Jane"));
+        players.add(new Player("Daniel"));
+        players.add(new Player("Gabrielle"));
+        players.add(new Player("Nelson"));
+        players.add(new Player("Thea"));
 
         this.deckBuilder = deckBuilder;
         this.handIdentifier = handIdentifier;
@@ -185,6 +189,27 @@ public class Game {
 
     public String displayCurrentHand(Player player) {
         return player.getHand().get(0).getRank().toString();
+    }
+
+    private void determineWinnersAndLosers() {
+        winners.clear();
+        losers.clear();
+
+        for (Player player : players) {
+            if (checkIfPlayerWon(player)) {
+                winners.add(player);
+            } else {
+                losers.add(player);
+            }
+        }
+    }
+
+    public List<Player> getWinners() {
+        return winners;
+    }
+
+    public List<Player> getLosers() {
+        return losers;
     }
 
 }
