@@ -2,13 +2,13 @@ package com.entjava.poker.game;
 
 import com.entjava.poker.card.BlankCard;
 import com.entjava.poker.card.Card;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/")
@@ -25,6 +25,25 @@ public class GameController {
 	public List<Player> player()
 	{
 		return game.getPlayers();
+	}
+
+	@GetMapping("/start_game/{id}")
+	public ResponseEntity<Map<String, Object>> startGame(@PathVariable long id) {
+		game.startNewGame();
+		List<Player> players = game.getPlayers();
+		List<Map<String, String>> playerDetails = players.stream().map(player -> {
+
+			Map<String, String> playerMap = new HashMap<>();
+			playerMap.put("name", player.getName());
+
+			return playerMap;
+
+		}).collect(Collectors.toList());
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("players", playerDetails);
+
+		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping("/start_game")
